@@ -6,14 +6,13 @@ public class User implements Player {
     private static final String ENTER_COORDINATES = "Enter the coordinates: > ";
     private static final String CELL_COORDINATES_TYPE_ERROR = "You should enter numbers!";
 
-    private final Cell playerCell;
+    private final Cell playerCell = Cell.X;
     private final Board board;
     private final Scanner scanner;
 
-    public User(Scanner scanner, Board board, Cell playerCell) {
+    public User(Scanner scanner, Board board) {
         this.scanner = scanner;
         this.board = board;
-        this.playerCell = playerCell;
     }
 
     @Override
@@ -35,7 +34,7 @@ public class User implements Player {
             if (y == null || x == null) {
                 scanner.nextLine();
                 System.out.println(CELL_COORDINATES_TYPE_ERROR);
-            } else if (board.setCell(y, x, playerCell)) {
+            } else if (board.setCell(new Coordinate(x, y), playerCell)) {
                 break;
             }
         }

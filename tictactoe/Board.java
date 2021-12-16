@@ -11,6 +11,8 @@ public class Board {
 
     private Board() {
         cells = new Cell[3][3];
+        Arrays.stream(cells)
+                .forEach(cellRow -> Arrays.fill(cellRow, Cell.EMPTY));
     }
 
     public static Board getInstance() {
@@ -20,20 +22,13 @@ public class Board {
         return board;
     }
 
-    public void setBoardCells(String initialBoardState) {
-        final String adjustedInitialBoardState = initialBoardState.replaceAll("_", " ");
-        for (int i = 0; i < adjustedInitialBoardState.length(); i++) {
-            int y = i / 3;
-            int x = i % 3;
-            cells[y][x] = Cell.getCellFromText(String.valueOf(adjustedInitialBoardState.charAt(i)));
-        }
-    }
-
     public Cell[][] getBoardCells() {
         return cells;
     }
 
-    public boolean setCell(int y, int x, Cell cell) {
+    public boolean setCell(Coordinate coordinate, Cell cell) {
+        int x = coordinate.getX();
+        int y = coordinate.getY();
         if (x < 1 || x > 3 || y < 1 || y > 3) {
             System.out.println(CELL_COORDINATES_BOUNDS_ERROR);
         } else if (!cells[y - 1][x - 1].toString().equals(" ")) {
