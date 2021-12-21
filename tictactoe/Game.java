@@ -1,36 +1,69 @@
 package tictactoe;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Game {
     private static final String NOT_FINISHED = "Game not finished";
     private static final String DRAW = "Draw";
     private static final String X_WINS = "X wins";
     private static final String O_WINS = "O wins";
+    private static final String BAD_PARAMETERS = "Bad parameters!";
+    private static final List<PlayerType> COMMANDS = Arrays.asList(
+            PlayerType.USER,
+            PlayerType.EASY,
+            PlayerType.MEDIUM);
 
     static final Scanner scanner = new Scanner(System.in);
     private final Board board;
-    private final Player user;
-    private final Player ai;
-    private volatile String gameState;
+    private Player player1;
+    private Player player2;
+    private String gameState;
 
     public Game() {
         board = Board.getInstance();
-        user = new User(scanner, board);
-        ai = new Ai(board);
+    }
+
+    public void inputCommand() {
+        String[] commandParts;
+        List<PlayerType> playerTypes;
+
+        while (true) {
+            System.out.print("Input command: ");
+            commandParts = scanner.nextLine().split(" ");
+
+            playerTypes = Arrays.stream(commandParts)
+                    .skip(1)
+                    .map(PlayerType::getPlayerTypeByName)
+                    .collect(Collectors.toList());
+
+            if (commandParts[0].equals("exit")) {
+                System.exit(0);
+            } else if (commandParts[0].equals("start") && commandParts.length >= 3) {
+                if (COMMANDS.containsAll(playerTypes)) {
+                    break;
+                }
+            }
+            System.out.println(BAD_PARAMETERS);
+        }
+
+        PlayerCreator playerCreator = new PlayerCreator();
+        player1 = playerCreator.create(playerTypes.get(0), Cell.X);
+        player2 = playerCreator.create(playerTypes.get(1), Cell.O);
     }
 
     public void start() {
         System.out.println(board);
         while (true) {
-            user.makeMove();
+            player1.makeMove();
             System.out.println(board);
             updateGameState();
             if (!gameState.equals(NOT_FINISHED)) {
                 break;
             }
-            ai.makeMove();
+            player2.makeMove();
             System.out.println(board);
             updateGameState();
             if (!gameState.equals(NOT_FINISHED)) {
@@ -43,7 +76,7 @@ public class Game {
     }
 
     private void updateGameState() {
-        BoardStateChecker boardStateChecker = new BoardStateChecker();
+        BoardStateChecker boardStateChecker = new BoardStateChecker(board);
 
         if (boardStateChecker.checkWin(Cell.X)) {
             gameState = X_WINS;
@@ -56,58 +89,19 @@ public class Game {
         }
     }
 
-    class BoardStateChecker {
-        private Cell playerCell;
+    class PlayerCreator {
+        public Player create(PlayerType playerType, Cell playerCell) {
+            Player player;
 
-        public boolean checkAllCellsNotEmpty() {
-            return Arrays.stream(board.getBoardCells())
-                    .allMatch(cellRow -> Arrays.stream(cellRow)
-                            .noneMatch(cell -> cell.equals(Cell.EMPTY)));
-        }
-
-        boolean checkWin(Cell playerCell) {
-            this.playerCell = playerCell;
-            return checkHorizontalWin()
-                    | checkVerticalWin()
-                    | checkUpwardDiagonalWin()
-                    | checkDownwardDiagonalWin();
-        }
-
-        boolean checkHorizontalWin() {
-            return Arrays.stream(board.getBoardCells())
-                    .anyMatch(cellRow -> Arrays.stream(cellRow)
-                            .allMatch(cell -> cell.equals(playerCell)));
-        }
-
-        boolean checkVerticalWin() {
-            Cell[][] boardCells = board.getBoardCells();
-            for (int i = 0; i < 3; i++) {
-                int finalI = i;
-                if (Arrays.stream(boardCells).allMatch(cellRow -> cellRow[finalI].equals(playerCell))) {
-                    return true;
-                }
+            switch (playerType) {
+                case EASY: player = new EasyAi(board, playerCell);
+                    break;
+                case MEDIUM: player = new MediumAi(board, playerCell);
+                    break;
+                default: player = new User(scanner, board, playerCell);
             }
-            return false;
-        }
 
-        boolean checkUpwardDiagonalWin() {
-            Cell[][] boardCells = board.getBoardCells();
-            for (int i = 0; i < boardCells.length; i++) {
-                if (boardCells[i][i] != playerCell) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        boolean checkDownwardDiagonalWin() {
-            Cell[][] boardCells = board.getBoardCells();
-            for (int i = 0; i < boardCells.length; i++) {
-                if (boardCells[i][boardCells.length - 1 - i] != playerCell) {
-                    return false;
-                }
-            }
-            return true;
+            return player;
         }
     }
 }

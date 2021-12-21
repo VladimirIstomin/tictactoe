@@ -3,9 +3,6 @@ package tictactoe;
 import java.util.Arrays;
 
 public class Board {
-    private static final String CELL_COORDINATES_BOUNDS_ERROR = "Coordinates should be from 1 to 3!";
-    private static final String CELL_OCCUPIED_ERROR = "This cell is occupied! Choose another one!";
-
     private static Board board;
     private final Cell[][] cells;
 
@@ -26,18 +23,11 @@ public class Board {
         return cells;
     }
 
-    public boolean setCell(Coordinate coordinate, Cell cell) {
+    public void setCell(Coordinate coordinate, Cell cell) {
         int x = coordinate.getX();
         int y = coordinate.getY();
-        if (x < 1 || x > 3 || y < 1 || y > 3) {
-            System.out.println(CELL_COORDINATES_BOUNDS_ERROR);
-        } else if (!cells[y - 1][x - 1].toString().equals(" ")) {
-            System.out.println(CELL_OCCUPIED_ERROR);
-        } else {
-            cells[y - 1][x - 1] = cell;
-            return true;
-        }
-        return false;
+
+        cells[y - 1][x - 1] = cell;
     }
 
     @Override

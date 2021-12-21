@@ -3,27 +3,20 @@ package tictactoe;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Ai implements Player {
-    private static final String EASY_LEVEL_MOVE_MESSAGE = "Making move level \"easy\"";
+public abstract class Ai implements Player {
+    protected final Board board;
+    protected final Cell playerCell;
+    protected BoardStateChecker boardStateChecker;
 
-    private final Board board;
-    private final Cell playerCell = Cell.O;
-
-
-    public Ai(Board board) {
+    public Ai(Board board, Cell playerCell) {
         this.board = board;
+        this.playerCell = playerCell;
+        boardStateChecker = new BoardStateChecker(board);
     }
 
-    @Override
-    public void makeMove() {
-        System.out.println(EASY_LEVEL_MOVE_MESSAGE);
+    public abstract void makeMove();
 
-        Coordinate coordinate = getRandomEmptyCellCoordinate();
-
-        board.setCell(coordinate, playerCell);
-    }
-
-    private Coordinate getRandomEmptyCellCoordinate() {
+    public void setRandomMoveCell() {
         ArrayList<Coordinate> emptyCellsCoordinates = new ArrayList<>();
         Cell[][] boardCells = board.getBoardCells();
 
@@ -36,6 +29,6 @@ public class Ai implements Player {
         }
 
         Random random = new Random();
-        return emptyCellsCoordinates.get(random.nextInt(emptyCellsCoordinates.size()));
+        board.setCell(emptyCellsCoordinates.get(random.nextInt(emptyCellsCoordinates.size())), playerCell);
     }
 }
