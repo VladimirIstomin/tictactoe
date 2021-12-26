@@ -1,13 +1,13 @@
-package tictactoe;
+package tictactoe.Board;
 
-public enum Cell {
+public enum CellType {
     EMPTY(" "),
     X("X"),
     O("O");
 
     private final String name;
 
-    private Cell(String name) {
+    private CellType(String name) {
         this.name = name;
     }
 

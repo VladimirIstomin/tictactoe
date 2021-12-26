@@ -1,5 +1,10 @@
 package tictactoe;
 
+import tictactoe.Board.Board;
+import tictactoe.Board.BoardStateChecker;
+import tictactoe.Board.CellType;
+import tictactoe.Player.*;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -11,19 +16,22 @@ public class Game {
     private static final String X_WINS = "X wins";
     private static final String O_WINS = "O wins";
     private static final String BAD_PARAMETERS = "Bad parameters!";
+    private static final Scanner SCANNER = new Scanner(System.in);
     private static final List<PlayerType> COMMANDS = Arrays.asList(
             PlayerType.USER,
             PlayerType.EASY,
-            PlayerType.MEDIUM);
+            PlayerType.MEDIUM,
+            PlayerType.HARD);
 
-    static final Scanner scanner = new Scanner(System.in);
     private final Board board;
+    private final BoardStateChecker boardStateChecker;
     private Player player1;
     private Player player2;
     private String gameState;
 
     public Game() {
         board = Board.getInstance();
+        boardStateChecker = new BoardStateChecker(board); // make singletone
     }
 
     public void inputCommand() {
@@ -32,7 +40,7 @@ public class Game {
 
         while (true) {
             System.out.print("Input command: ");
-            commandParts = scanner.nextLine().split(" ");
+            commandParts = SCANNER.nextLine().split(" ");
 
             playerTypes = Arrays.stream(commandParts)
                     .skip(1)
@@ -50,8 +58,8 @@ public class Game {
         }
 
         PlayerCreator playerCreator = new PlayerCreator();
-        player1 = playerCreator.create(playerTypes.get(0), Cell.X);
-        player2 = playerCreator.create(playerTypes.get(1), Cell.O);
+        player1 = playerCreator.create(playerTypes.get(0), CellType.X);
+        player2 = playerCreator.create(playerTypes.get(1), CellType.O);
     }
 
     public void start() {
@@ -72,15 +80,13 @@ public class Game {
         }
         System.out.println(gameState);
 
-        scanner.close();
+        SCANNER.close();
     }
 
     private void updateGameState() {
-        BoardStateChecker boardStateChecker = new BoardStateChecker(board);
-
-        if (boardStateChecker.checkWin(Cell.X)) {
+        if (boardStateChecker.checkWin(CellType.X)) {
             gameState = X_WINS;
-        } else if (boardStateChecker.checkWin(Cell.O)) {
+        } else if (boardStateChecker.checkWin(CellType.O)) {
             gameState = O_WINS;
         } else if (boardStateChecker.checkAllCellsNotEmpty()) {
             gameState = DRAW;
@@ -90,15 +96,17 @@ public class Game {
     }
 
     class PlayerCreator {
-        public Player create(PlayerType playerType, Cell playerCell) {
+        public Player create(PlayerType playerType, CellType playerCell) {
             Player player;
 
             switch (playerType) {
-                case EASY: player = new EasyAi(board, playerCell);
+                case EASY: player = new EasyAi(board, boardStateChecker, playerCell);
                     break;
-                case MEDIUM: player = new MediumAi(board, playerCell);
+                case MEDIUM: player = new MediumAi(board, boardStateChecker, playerCell);
                     break;
-                default: player = new User(scanner, board, playerCell);
+                case HARD: player = new HardAi(board, boardStateChecker, playerCell);
+                    break;
+                default: player = new User(SCANNER, board, playerCell);
             }
 
             return player;

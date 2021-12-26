@@ -1,9 +1,10 @@
-package tictactoe;
+package tictactoe.Player;
 
 public enum PlayerType {
     USER("user"),
     EASY("easy"),
-    MEDIUM("medium");
+    MEDIUM("medium"),
+    HARD("hard");
 
     private final String name;
 

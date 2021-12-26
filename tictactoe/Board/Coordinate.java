@@ -1,4 +1,4 @@
-package tictactoe;
+package tictactoe.Board;
 
 public class Coordinate {
     private final int x;

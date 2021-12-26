@@ -1,4 +1,7 @@
-package tictactoe;
+package tictactoe.Player;
+
+import tictactoe.Board.Board;
+import tictactoe.Board.CellType;
 
 import java.util.Scanner;
 
@@ -8,11 +11,11 @@ public class User implements Player {
     private static final String CELL_COORDINATES_BOUNDS_ERROR = "Coordinates should be from 1 to 3!";
     private static final String CELL_OCCUPIED_ERROR = "This cell is occupied! Choose another one!";
 
-    private final Cell playerCell;
+    private final CellType playerCell;
     private final Board board;
     private final Scanner scanner;
 
-    public User(Scanner scanner, Board board, Cell playerCell) {
+    public User(Scanner scanner, Board board, CellType playerCell) {
         this.scanner = scanner;
         this.board = board;
         this.playerCell = playerCell;
@@ -34,15 +37,16 @@ public class User implements Player {
                 x = scanner.nextInt();
             }
 
+            scanner.nextLine();
+
             if (y == null || x == null) {
-                scanner.nextLine();
                 System.out.println(CELL_COORDINATES_TYPE_ERROR);
             } else if (x < 1 || x > 3 || y < 1 || y > 3) {
                 System.out.println(CELL_COORDINATES_BOUNDS_ERROR);
-            } else if (board.getBoardCells()[y - 1][x - 1] != Cell.EMPTY) {
+            } else if (board.getCells()[(y - 1) * 3 + x - 1].getCellType() != CellType.EMPTY) {
                 System.out.println(CELL_OCCUPIED_ERROR);
             } else {
-                board.setCell(new Coordinate(x, y), playerCell);
+                board.setCell(board.getCells()[(y - 1) * 3 + x - 1].getCoordinate(), playerCell);
                 break;
             }
         }
