@@ -31,7 +31,7 @@ public class Game {
 
     public Game() {
         board = Board.getInstance();
-        boardStateChecker = new BoardStateChecker(board); // make singletone
+        boardStateChecker = new BoardStateChecker(board);
     }
 
     public void inputCommand() {
